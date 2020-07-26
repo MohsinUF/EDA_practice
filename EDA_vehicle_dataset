@@ -1,0 +1,74 @@
+# library
+library(tidyverse)
+
+# reading data
+data = read.csv(file.choose(), header = T)
+d = data # reserved data, just in case
+head(data)
+str(data)
+summary(data)
+data$State = as.factor(data$State)
+
+# dealing with the missing values
+# labor hour
+sum(data$lh == 0)
+data$lh[data$lh == 0] = mean(data$lh)
+# labor cost
+sum(data$lc == 0)
+data$lc[data$lc == 0] = mean(data$lc)
+
+## how are labor hours & labor cost related in CA, TX & FL?
+# data preparation
+vehicle = data %>%
+  filter(State == "CA" | State == "TX" | State == "FL") %>%
+  ggplot(aes(lh, lc, fill = State)) +
+  geom_point()+
+  facet_wrap(~State)+
+  ggtitle("Labor Cost vs Labor Hour", "Source: Online")+
+  geom_smooth(method = "lm", col = "red")+
+  scale_x_continuous("Labor Hours", limits = c(0, 40))+
+  scale_y_continuous("Labor cost", limits = c(0, 3000))+
+  theme_bw()
+
+# bar plot for states
+data %>%
+  ggplot(aes(State)) +
+  geom_bar() +
+  coord_flip() 
+
+data %>%
+  filter(State == "CA" | State == "TX" | State == "FL" | State == "GA" |
+           State == "AZ" | State == "LA") %>%
+  ggplot(aes(State, fill = State)) +
+  geom_bar() +
+  coord_flip() 
+
+# pie chart or radar chart
+data %>%
+  filter(State == "CA" | State == "TX" | State == "FL" | State == "GA" |
+           State == "AZ" | State == "LA") %>%
+  ggplot(aes(State, fill = State)) +
+  geom_bar(width = 1) +
+  coord_polar(theta = "x")
+
+# histogram
+data %>%
+  filter(State == "CA" | State == "TX" | State == "FL" | State == "GA" |
+           State == "AZ" | State == "LA") %>%
+  ggplot(aes(Mileage, fill = State)) +
+  geom_histogram(binwidth = 5000, color = "red", alpha = 0.8) +
+  facet_wrap(~ State) +
+  ggtitle("Histogram showing the Mileage") +
+  geom_density(alpha = 0.2) +
+  theme(legend.position = "none")
+
+# density plot
+data %>%
+  filter(State == "CA" | State == "TX" | State == "FL" | State == "GA" |
+           State == "AZ" | State == "LA") %>%
+  ggplot(aes(Mileage, fill = State)) +
+  geom_density(binwidth = 5000, color = "red", alpha = 0.8) +
+  facet_wrap(~ State) +
+  ggtitle("Density plot for Mileage") +
+  geom_density(alpha = 0.2) +
+  theme(legend.position = "none")
